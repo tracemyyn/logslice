@@ -36,3 +36,19 @@ def test_parse_logfmt_single_pair():
     line = "host=localhost"
     result = parse_line(line)
     assert result == {"host": "localhost"}
+
+
+def test_parse_json_with_nested_fields():
+    """JSON lines with nested objects should be parsed and returned as-is."""
+    line = '{"level": "debug", "context": {"user": "alice", "id": 42}}'
+    result = parse_line(line)
+    assert result == {"level": "debug", "context": {"user": "alice", "id": 42}}
+
+
+def test_parse_logfmt_empty_value():
+    """Logfmt keys with empty quoted values should be handled gracefully."""
+    line = 'level=info msg=""'
+    result = parse_line(line)
+    assert result is not None
+    assert result.get("level") == "info"
+    assert result.get("msg") == ""
