@@ -23,6 +23,20 @@ def add_limit_args(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def validate_limit_args(args: argparse.Namespace) -> None:
+    """Raise :class:`argparse.ArgumentTypeError` if limit/offset values are negative.
+
+    Call this after :func:`argparse.ArgumentParser.parse_args` to surface
+    user-friendly error messages before any records are processed.
+    """
+    limit: int = getattr(args, "limit", 0) or 0
+    offset: int = getattr(args, "offset", 0) or 0
+    if limit < 0:
+        raise argparse.ArgumentTypeError("--limit must be a non-negative integer.")
+    if offset < 0:
+        raise argparse.ArgumentTypeError("--offset must be a non-negative integer.")
+
+
 def apply_limit_args(args: argparse.Namespace, records: Iterable[dict]) -> Iterator[dict]:
     """Apply limit/offset from parsed *args* to *records*.
 
