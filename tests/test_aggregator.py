@@ -33,6 +33,18 @@ def test_count_by_field_missing_key():
     assert counts["info"] == 1
 
 
+def test_count_by_field_empty():
+    """count_by_field on an empty list should return an empty list."""
+    result = count_by_field([], "level")
+    assert result == []
+
+
+def test_count_by_field_single_record():
+    """count_by_field with one record returns a single-element list."""
+    result = count_by_field([{"level": "debug"}], "level")
+    assert result == [("debug", 1)]
+
+
 def test_group_by_field_keys():
     groups = group_by_field(RECORDS, "service")
     assert set(groups.keys()) == {"api", "worker"}
