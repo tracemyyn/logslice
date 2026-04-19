@@ -39,6 +39,18 @@ from logslice.redact import apply_redactions
 cleaned = list(apply_redactions(records, fields=["password"], pattern=r"\d{16}"))
 ```
 
+### `redact_nested(record, fields)`
+
+Like `redact_fields`, but also redacts matching keys found in nested
+dictionaries within the record.
+
+```python
+from logslice.redact import redact_nested
+
+out = redact_nested({"user": "alice", "auth": {"token": "s3cr3t"}}, ["token"])
+# {"user": "alice", "auth": {"token": "***"}}
+```
+
 ## CLI usage
 
 Pass `--redact-field` and/or `--redact-pattern` flags (when wired into the
