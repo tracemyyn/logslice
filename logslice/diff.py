@@ -48,3 +48,23 @@ def only_changed(
     for rec in diff_records(records, fields=fields):
         if rec.get("_changed"):
             yield rec
+
+
+def summarise_changes(
+    records: Iterator[Dict[str, Any]],
+    fields: Optional[List[str]] = None,
+) -> Dict[str, int]:
+    """Return a count of how many times each field changed across all records.
+
+    Args:
+        records: Iterable of parsed log records.
+        fields: If given, only count changes in these fields.
+
+    Returns:
+        A dict mapping field name to the number of records in which it changed.
+    """
+    counts: Dict[str, int] = {}
+    for rec in diff_records(records, fields=fields):
+        for field in rec.get("_changed", []):
+            counts[field] = counts.get(field, 0) + 1
+    return counts
