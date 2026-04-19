@@ -36,3 +36,18 @@ def parse_filter_arg(arg: str) -> Optional[tuple[str, str]]:
     if not field or not pattern:
         return None
     return field, pattern
+
+
+def parse_filter_args(args: list[str]) -> Optional[list[tuple[str, str]]]:
+    """Parse a list of CLI filter arguments into (field, pattern) tuples.
+
+    Returns a list of parsed filters, or None if any argument is invalid.
+    Invalid arguments are those that don't conform to 'field=pattern' format.
+    """
+    filters = []
+    for arg in args:
+        parsed = parse_filter_arg(arg)
+        if parsed is None:
+            return None
+        filters.append(parsed)
+    return filters
