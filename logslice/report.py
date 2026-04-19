@@ -10,14 +10,15 @@ def _table_row(cols: List[str], widths: List[int]) -> str:
     return "  ".join(str(c).ljust(w) for c, w in zip(cols, widths))
 
 
-def render_count_table(counts: List[tuple], field: str) -> str:
-    """Render count_by_field results as a plain-text table."""
-    header = [field, "count"]
-    rows = [[str(v), str(c)] for v, c in counts]
+def _compute_widths(header: List[str], rows: List[List[str]]) -> List[int]:
+    """Compute column widths based on the header and all data rows."""
     all_rows = [header] + rows
-    widths = [
-        max(len(r[i]) for r in all_rows) for i in range(len(header))
-    ]
+    return [max(len(r[i]) for r in all_rows) for i in range(len(header))]
+
+
+def _build_table(header: List[str], rows: List[List[str]]) -> str:
+    """Build a plain-text table string from a header and data rows."""
+    widths = _compute_widths(header, rows)
     lines = [
         _table_row(header, widths),
         "-" * (sum(widths) + 2 * (len(widths) - 1)),
@@ -25,6 +26,13 @@ def render_count_table(counts: List[tuple], field: str) -> str:
     for row in rows:
         lines.append(_table_row(row, widths))
     return "\n".join(lines)
+
+
+def render_count_table(counts: List[tuple], field: str) -> str:
+    """Render count_by_field results as a plain-text table."""
+    header = [field, "count"]
+    rows = [[str(v), str(c)] for v, c in counts]
+    return _build_table(header, rows)
 
 
 def render_summary_table(summary: List[Dict[str, Any]], group_field: str) -> str:
@@ -34,15 +42,7 @@ def render_summary_table(summary: List[Dict[str, Any]], group_field: str) -> str
     col_keys = list(summary[0].keys())
     header = [group_field if k == "group" else k for k in col_keys]
     rows = [[str(entry[k]) for k in col_keys] for entry in summary]
-    all_rows = [header] + rows
-    widths = [max(len(r[i]) for r in all_rows) for i in range(len(header))]
-    lines = [
-        _table_row(header, widths),
-        "-" * (sum(widths) + 2 * (len(widths) - 1)),
-    ]
-    for row in rows:
-        lines.append(_table_row(row, widths))
-    return "\n".join(lines)
+    return _build_table(header, rows)
 
 
 def report(
