@@ -39,6 +39,14 @@ def test_sample_first_record_always_included():
     assert result[0]["idx"] == 0
 
 
+def test_sample_preserves_record_contents():
+    """Sampled records should be the original dicts, not copies."""
+    recs = _records(20)
+    result = list(sample_records(iter(recs), rate=1.0))
+    for original, sampled in zip(recs, result):
+        assert sampled is original
+
+
 # ---------------------------------------------------------------------------
 # sample_records – field mode
 # ---------------------------------------------------------------------------
@@ -89,3 +97,11 @@ def test_reservoir_records_are_original():
     result = reservoir_sample(iter(recs), k=10)
     for r in result:
         assert r in recs
+
+
+def test_reservoir_no_duplicates():
+    """reservoir_sample should never return the same record twice."""
+    recs = _records(50)
+    result = reservoir_sample(iter(recs), k=20)
+    indices = [r["idx"] for r in result]
+    assert len(indices) == len(set(indices))
