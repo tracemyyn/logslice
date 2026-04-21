@@ -57,3 +57,12 @@ def test_save_overwrites(sdir):
     save_session("cfg", {"a": 1}, sdir)
     save_session("cfg", {"a": 99}, sdir)
     assert load_session("cfg", sdir)["a"] == 99
+
+
+def test_list_sessions_does_not_include_non_session_files(sdir):
+    """Files that are not session files should not appear in list_sessions."""
+    save_session("valid", {"x": 1}, sdir)
+    # Manually place a stray file in the sessions directory
+    sdir.mkdir(parents=True, exist_ok=True)
+    (sdir / "README.txt").write_text("not a session")
+    assert list_sessions(sdir) == ["valid"]
