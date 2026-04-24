@@ -34,6 +34,14 @@ Useful when later records contain updated context:
 logslice app.log --dedup-fields request_id --dedup-keep last
 ```
 
+### Combine with time filters
+
+Deduplicate error messages within a specific time window:
+
+```bash
+logslice app.log --start 2024-01-15T08:00:00 --end 2024-01-15T09:00:00 --dedup-fields level msg
+```
+
 ## Notes
 
 - `--dedup` (exact) and `--dedup-fields` can be combined; when `--dedup-fields` is
@@ -42,3 +50,5 @@ logslice app.log --dedup-fields request_id --dedup-keep last
   `--dedup-keep first` (the default) which streams with O(n) memory in keys only.
 - Deduplication runs **after** time and field filters, so only matching records
   are considered.
+- If a field specified in `--dedup-fields` is missing from a record, that record
+  is treated as having `null` for that field when computing the dedup key.
