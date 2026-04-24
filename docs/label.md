@@ -18,6 +18,9 @@ For every record, rules are evaluated in order.  The **first** rule whose
 If no rule matches and `--label-default` is provided, `dest_field` is set to
 the default value.
 
+> **Note:** If `src_field` is absent from a record, that rule is silently
+> skipped and evaluation continues with the next rule.
+
 ## CLI flags
 
 | Flag | Description |
@@ -44,6 +47,20 @@ logslice access.log \
   --label area:path:^/static:assets \
   --label-default other \
   --output json
+```
+
+## Multiple destination fields
+
+You can apply rules to different destination fields in a single command.
+Each destination field is resolved independently:
+
+```bash
+logslice app.log \
+  --label tier:level:error:high \
+  --label tier:level:warn:medium \
+  --label team:service:^payments:billing \
+  --label team:service:^auth:identity \
+  --label-default unknown
 ```
 
 ## Python API
