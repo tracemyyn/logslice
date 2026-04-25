@@ -55,6 +55,22 @@ def test_apply_limit_offset_and_limit():
     assert result[-1]["i"] == 6
 
 
+def test_apply_limit_offset_only():
+    """Offset without a limit should return all remaining records."""
+    result = list(apply_limit(_recs(5), offset=2))
+    assert len(result) == 3
+    assert result[0]["i"] == 2
+    assert result[-1]["i"] == 4
+
+
+def test_apply_limit_limit_only():
+    """Limit without an offset should return the first n records."""
+    result = list(apply_limit(_recs(5), limit=3))
+    assert len(result) == 3
+    assert result[0]["i"] == 0
+    assert result[-1]["i"] == 2
+
+
 # --- CLI helpers ---
 
 def _make_args(**kwargs):
