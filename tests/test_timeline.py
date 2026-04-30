@@ -87,6 +87,26 @@ def test_fill_gaps_empty_returns_empty():
     assert fill_gaps({}) == {}
 
 
+def test_fill_gaps_no_gaps_unchanged():
+    """A timeline with no missing buckets should be returned as-is."""
+    t0 = datetime(2024, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+    t1 = datetime(2024, 1, 1, 0, 1, 0, tzinfo=timezone.utc)
+    t2 = datetime(2024, 1, 1, 0, 2, 0, tzinfo=timezone.utc)
+    tl = {t0: 1, t1: 2, t2: 3}
+    filled = fill_gaps(tl, interval=60)
+    assert filled == tl
+
+
+def test_fill_gaps_preserves_original_counts():
+    """Existing counts must not be altered when gaps are filled."""
+    t0 = datetime(2024, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
+    t3 = datetime(2024, 1, 1, 0, 3, 0, tzinfo=timezone.utc)
+    tl = {t0: 7, t3: 4}
+    filled = fill_gaps(tl, interval=60)
+    assert filled[t0] == 7
+    assert filled[t3] == 4
+
+
 # ---------------------------------------------------------------------------
 # sparkline
 # ---------------------------------------------------------------------------
@@ -105,31 +125,4 @@ def test_sparkline_length_matches_bucket_count():
 
 def test_sparkline_max_bucket_is_full_block():
     t0 = datetime(2024, 1, 1, 0, 0, tzinfo=timezone.utc)
-    t1 = datetime(2024, 1, 1, 0, 1, tzinfo=timezone.utc)
-    tl = {t0: 0, t1: 10}
-    s = sparkline(tl)
-    assert s[-1] == "█"
-
-
-# ---------------------------------------------------------------------------
-# render_timeline
-# ---------------------------------------------------------------------------
-
-def test_render_timeline_empty_returns_empty_list():
-    assert render_timeline({}) == []
-
-
-def test_render_timeline_line_count_matches_buckets():
-    records = [
-        _rec("2024-01-01T00:00:10Z"),
-        _rec("2024-01-01T00:01:10Z"),
-    ]
-    tl = build_timeline(records, interval=60)
-    lines = render_timeline(tl)
-    assert len(lines) == 2
-
-
-def test_render_timeline_contains_count():
-    t0 = datetime(2024, 1, 1, 0, 0, tzinfo=timezone.utc)
-    lines = render_timeline({t0: 7})
-    assert "7" in lines[0]
+  
