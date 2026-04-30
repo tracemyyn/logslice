@@ -47,6 +47,14 @@ def test_apply_mask_args_regex_flag():
     assert result[0]["secret"] == "pass****"
 
 
+def test_apply_mask_args_regex_flag_custom_char():
+    """Masking with a custom mask character should replace matched digits."""
+    records = [{"secret": "pass1234"}]
+    args = _make_args(mask=["secret:\\d+"], mask_char="#")
+    result = apply_mask_args(records, args)
+    assert result[0]["secret"] == "pass####"
+
+
 def test_apply_mask_args_preset_flag():
     records = [{"email": "test@domain.com"}]
     args = _make_args(mask_preset=["email:email"])
